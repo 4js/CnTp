@@ -4,25 +4,25 @@
       <div class="top">
         <div class="header">
           <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Ant Design</span>
+            <img src="~@/assets/logo.png" class="logo" alt="logo">
+            <span class="title">成都分公司</span>
           </a>
         </div>
         <div class="desc">
-          Ant Design 是西湖区最具影响力的 Web 设计规范
+          健步行-太平人寿管理后台
         </div>
       </div>
 
       <route-view></route-view>
 
       <div class="footer">
-        <div class="links">
+        <!-- <div class="links">
           <a href="_self">帮助</a>
           <a href="_self">隐私</a>
           <a href="_self">条款</a>
-        </div>
+        </div> -->
         <div class="copyright">
-          Copyright &copy; 2018 白鹭学园技术组出品
+          Copyright &copy; 2020 太平人寿成都分公司出品
         </div>
       </div>
     </div>
@@ -78,8 +78,8 @@ export default {
         text-align: center;
 
         .header {
-          height: 44px;
-          line-height: 44px;
+          height: 60px;
+          line-height: 60px;
 
           .badge {
             position: absolute;
@@ -92,14 +92,14 @@ export default {
           }
 
           .logo {
-            height: 44px;
+            height: 60px;
             vertical-align: top;
             margin-right: 16px;
             border-style: none;
           }
 
           .title {
-            font-size: 33px;
+            font-size: 20px;
             color: rgba(0, 0, 0, .85);
             font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
             font-weight: 600;
