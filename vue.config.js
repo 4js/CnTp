@@ -86,15 +86,15 @@ const vueConfig = {
 
   devServer: {
     // development server port 8000
-    port: 8000,
+    port: 8000
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
-    proxy: {
-      'index.php': {
-        target: 'http://test.cloud.manager.topasst.com',
-        ws: false,
-        changeOrigin: true
-      }
-    }
+    // proxy: {
+    //   'index.php': {
+    //     target: 'http://test.cloud.manager.topasst.com',
+    //     ws: false,
+    //     changeOrigin: true
+    //   }
+    // }
   },
 
   // disable source map in production

@@ -12,11 +12,14 @@ import { axios } from '@/utils/request'
  * @param parameter
  * @returns {*}
  */
-export function login (parameter) {
+export function login (data) {
   return axios({
     url: '?c=admin&a=login&v=app&site=gateway',
     method: 'post',
-    data: parameter
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data
   })
 }
 

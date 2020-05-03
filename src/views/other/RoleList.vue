@@ -80,6 +80,7 @@
 
 <script>
 import { STable } from '@/components'
+import { getRoleList } from '@/api/manage'
 import RoleModal from './modules/RoleModal'
 
 export default {
@@ -128,11 +129,8 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return this.$http.get('/role', {
-          params: Object.assign(parameter, this.queryParam)
-        }).then(res => {
-          return res.result
-        })
+        return getRoleList().then(res => res.data)
+        // params: Object.assign(parameter, this.queryParam
       },
 
       selectedRowKeys: [],

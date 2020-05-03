@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import axios from 'axios'
 import store from '@/store'
+import qs from 'qs'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
 
 // 创建 axios 实例
 const service = axios.create({
@@ -41,9 +42,14 @@ const err = (error) => {
 // request interceptor
 service.interceptors.request.use(config => {
   const token = Vue.ls.get(ACCESS_TOKEN)
+  const adminId = Vue.ls.get(ADMIN_ID)
+  console.log(token)
+  console.log(adminId)
   if (token) {
-    config.headers['Access-Token'] = token // 让每个请求携带自定义 token 请根据实际情况自行修改
+    config.data = Object.assign({ key_token: token, admin_id: adminId }, config.data) // 让每个请求携带自定义 token 请根据实际情况自行修改
   }
+  config.data = qs.stringify(config.data)
+  console.log(config)
   return config
 }, err)
 

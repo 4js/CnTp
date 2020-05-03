@@ -19,11 +19,11 @@ export function getUserList (parameter) {
   })
 }
 
-export function getRoleList (parameter) {
+export function getRoleList (data) {
   return axios({
-    url: api.role,
-    method: 'get',
-    params: parameter
+    url: '?c=adminrole&a=selectrole&v=manager',
+    method: 'post',
+    data
   })
 }
 

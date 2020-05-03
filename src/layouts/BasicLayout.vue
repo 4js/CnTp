@@ -70,6 +70,7 @@ import SideMenu from '@/components/Menu/SideMenu'
 import GlobalHeader from '@/components/GlobalHeader'
 import GlobalFooter from '@/components/GlobalFooter'
 import SettingDrawer from '@/components/SettingDrawer'
+import { asyncRouterMap } from '@/config/router.config'
 import { convertRoutes } from '@/utils/routeConvert'
 
 export default {
@@ -110,7 +111,8 @@ export default {
     }
   },
   created () {
-    const routes = convertRoutes(this.mainMenu.find(item => item.path === '/'))
+    // const routes = convertRoutes(this.mainMenu.find(item => item.path === '/'))
+    const routes = convertRoutes(asyncRouterMap.find(item => item.path === '/'))
     this.menus = (routes && routes.children) || []
     this.collapsed = !this.sidebarOpened
   },
