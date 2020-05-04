@@ -27,7 +27,17 @@
       </a-form>
     </div>
 
-    <s-table
+    <a-table :columns="columns" :data-source="data">
+      <span slot="action" slot-scope="text, record">
+        <a>Invite 一 {{ record.name }}</a>
+        <a-divider type="vertical" />
+        <a>Delete</a>
+        <a-divider type="vertical" />
+        <a class="ant-dropdown-link"> More actions <a-icon type="down" /> </a>
+      </span>
+    </a-table>
+
+    <!-- <s-table
       ref="table"
       size="default"
       :columns="columns"
@@ -71,7 +81,7 @@
           </a-menu>
         </a-dropdown>
       </span>
-    </s-table>
+    </s-table> -->
 
     <role-modal ref="modal" @ok="handleOk"></role-modal>
 
@@ -125,6 +135,26 @@ export default {
           width: '150px',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
+        }
+      ],
+      data: [
+        {
+          id: '1',
+          name: 'John Brown',
+          status: 32,
+          createTime: 'New York No. 1 Lake Park'
+        },
+        {
+          id: '123',
+          name: 'John Brown',
+          status: 32,
+          createTime: 'New York No. 1 Lake Park'
+        },
+        {
+          id: '198',
+          name: 'John Brown',
+          status: 32,
+          createTime: 'New York No. 1 Lake Park'
         }
       ],
       // 加载数据方法 必须为 Promise 对象

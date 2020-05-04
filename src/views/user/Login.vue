@@ -51,7 +51,7 @@
           type="primary"
           htmlType="submit"
           class="login-button"
-        >确定</a-button>
+        >登录</a-button>
       </a-form-item>
     </a-form>
   </div>
