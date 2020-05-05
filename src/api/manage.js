@@ -27,6 +27,14 @@ export function getRoleList (data) {
   })
 }
 
+export function editRole (data) {
+  return axios({
+    url: '?c=adminrole&a=updatestatus&v=manager',
+    method: 'post',
+    data
+  })
+}
+
 export function getServiceList (parameter) {
   return axios({
     url: api.service,

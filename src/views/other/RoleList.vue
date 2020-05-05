@@ -27,64 +27,76 @@
       </a-form>
     </div>
 
-    <a-table :columns="columns" :data-source="data">
+    <a-table row-key="role_id" :columns="columns" :data-source="data">
+      <template slot="status" slot-scope="text">
+        <span v-if="text==='1'">启用</span>
+        <span v-else>停用</span>
+      </template>
       <span slot="action" slot-scope="text, record">
-        <a>Invite 一 {{ record.name }}</a>
+        <a @click="handleEdit(record)">编辑</a>
         <a-divider type="vertical" />
-        <a>Delete</a>
+        <a v-if="record.status==='1'">停用</a>
+        <a v-else>启用</a>
         <a-divider type="vertical" />
-        <a class="ant-dropdown-link"> More actions <a-icon type="down" /> </a>
+        <a class="ant-dropdown-link">设置权限</a>
       </span>
     </a-table>
 
-    <!-- <s-table
-      ref="table"
-      size="default"
-      :columns="columns"
-      :data="loadData"
-    >
-      <div
-        slot="expandedRowRender"
-        slot-scope="record"
-        style="margin: 0">
-        <a-row
-          :gutter="24"
-          :style="{ marginBottom: '12px' }">
-          <a-col :span="12" v-for="(role, index) in record.permissions" :key="index" :style="{ marginBottom: '12px' }">
-            <a-col :span="4">
-              <span>{{ role.permissionName }}：</span>
-            </a-col>
-            <a-col :span="20" v-if="role.actionEntitySet.length > 0">
-              <a-tag color="cyan" v-for="(action, k) in role.actionEntitySet" :key="k">{{ action.describe }}</a-tag>
-            </a-col>
-            <a-col :span="20" v-else>-</a-col>
-          </a-col>
-        </a-row>
-      </div>
-      <span slot="action" slot-scope="text, record">
-        <a @click="$refs.modal.edit(record)">编辑</a>
-        <a-divider type="vertical" />
-        <a-dropdown>
-          <a class="ant-dropdown-link">
-            更多 <a-icon type="down" />
-          </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
-              <a href="javascript:;">详情</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">禁用</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">删除</a>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
-      </span>
-    </s-table> -->
-
-    <role-modal ref="modal" @ok="handleOk"></role-modal>
-
+    <a-modal v-model="visible" title="编辑角色" @ok="handleOk">
+      <a-form-model :model="ruleform" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="Activity name">
+          <a-input v-model="ruleform.name" />
+        </a-form-model-item>
+        <a-form-model-item label="Activity zone">
+          <a-select v-model="ruleform.region" placeholder="please select your zone">
+            <a-select-option value="shanghai">
+              Zone one
+            </a-select-option>
+            <a-select-option value="beijing">
+              Zone two
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="Activity time">
+          <a-date-picker
+            v-model="ruleform.date1"
+            show-time
+            type="date"
+            placeholder="Pick a date"
+            style="width: 100%;"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="Instant delivery">
+          <a-switch v-model="ruleform.delivery" />
+        </a-form-model-item>
+        <a-form-model-item label="Activity type">
+          <a-checkbox-group v-model="ruleform.type">
+            <a-checkbox value="1" name="type">
+              Online
+            </a-checkbox>
+            <a-checkbox value="2" name="type">
+              Promotion
+            </a-checkbox>
+            <a-checkbox value="3" name="type">
+              Offline
+            </a-checkbox>
+          </a-checkbox-group>
+        </a-form-model-item>
+        <a-form-model-item label="Resources">
+          <a-radio-group v-model="ruleform.resource">
+            <a-radio value="1">
+              Sponsor
+            </a-radio>
+            <a-radio value="2">
+              Venue
+            </a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+        <a-form-model-item label="Activity form">
+          <a-input v-model="ruleform.desc" type="textarea" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </a-card>
 </template>
 
@@ -107,104 +119,79 @@ export default {
 
       form: null,
       mdl: {},
-
-      // 高级搜索 展开/关闭
-      advanced: false,
       // 查询参数
       queryParam: {},
       // 表头
       columns: [
         {
-          title: '唯一识别码',
-          dataIndex: 'id'
+          title: '角色id',
+          dataIndex: 'role_id'
         },
         {
           title: '角色名称',
-          dataIndex: 'name'
+          dataIndex: 'role_name'
+        },
+        {
+          title: '角色备注',
+          dataIndex: 'mark'
         },
         {
           title: '状态',
-          dataIndex: 'status'
+          dataIndex: 'status',
+          scopedSlots: { customRender: 'status' }
         },
         {
           title: '创建时间',
-          dataIndex: 'createTime',
+          dataIndex: 'utime',
           sorter: true
-        }, {
+        },
+        {
           title: '操作',
-          width: '150px',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
         }
       ],
-      data: [
-        {
-          id: '1',
-          name: 'John Brown',
-          status: 32,
-          createTime: 'New York No. 1 Lake Park'
-        },
-        {
-          id: '123',
-          name: 'John Brown',
-          status: 32,
-          createTime: 'New York No. 1 Lake Park'
-        },
-        {
-          id: '198',
-          name: 'John Brown',
-          status: 32,
-          createTime: 'New York No. 1 Lake Park'
-        }
-      ],
-      // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return getRoleList().then(res => res.data)
-        // params: Object.assign(parameter, this.queryParam
-      },
-
-      selectedRowKeys: [],
-      selectedRows: []
+      data: [],
+      // formmodal
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
+      ruleform: {
+        name: '',
+        region: undefined,
+        date1: undefined,
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      }
     }
+  },
+  created () {
+    getRoleList().then(res => {
+      console.log(res)
+      this.data = res.data.list
+    })
   },
   methods: {
     handleEdit (record) {
       this.mdl = Object.assign({}, record)
+      this.mdl.permissions = []
 
-      this.mdl.permissions.forEach(permission => {
-        permission.actionsOptions = permission.actionEntitySet.map(action => {
-          return { label: action.describe, value: action.action, defaultCheck: action.defaultCheck }
-        })
-      })
+      // this.mdl.permissions.forEach(permission => {
+      //   permission.actionsOptions = permission.actionEntitySet.map(action => {
+      //     return { label: action.describe, value: action.action, defaultCheck: action.defaultCheck }
+      //   })
+      // })
 
       console.log(this.mdl)
       this.visible = true
     },
     handleOk () {
-      // 新增/修改 成功时，重载列表
-      this.$refs.table.refresh()
-    },
-    onChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = selectedRows
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
+      getRoleList().then(res => {
+        console.log(res)
+        this.data = res.data.list
+      })
     }
-  },
-  watch: {
-    /*
-      'selectedRows': function (selectedRows) {
-        this.needTotalList = this.needTotalList.map(item => {
-          return {
-            ...item,
-            total: selectedRows.reduce( (sum, val) => {
-              return sum + val[item.dataIndex]
-            }, 0)
-          }
-        })
-      }
-      */
   }
 }
 </script>

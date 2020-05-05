@@ -82,7 +82,9 @@ export default {
     }
   },
   created () {
-    getRoleList().then((res) => {
+    console.log(123)
+    getRoleList({role_name: '超级管理员', status: 1}).then((res) => {
+      console.log(res)
       this.roles = res.result.data
       this.roles.push({
         id: '-1',
@@ -91,7 +93,7 @@ export default {
       })
       console.log('this.roles', this.roles)
     })
-    this.loadPermissions()
+    // this.loadPermissions()
   },
   methods: {
     callback (val) {
@@ -142,24 +144,24 @@ export default {
         checkedAll: e.target.checked
       })
     },
-    loadPermissions () {
-      getPermissions().then(res => {
-        const result = res.result
-        this.permissions = result.map(permission => {
-          const options = actionToObject(permission.actionData)
-          permission.checkedAll = false
-          permission.selected = []
-          permission.indeterminate = false
-          permission.actionsOptions = options.map(option => {
-            return {
-              label: option.describe,
-              value: option.action
-            }
-          })
-          return permission
-        })
-      })
-    }
+    // loadPermissions () {
+    //   getPermissions().then(res => {
+    //     const result = res.result
+    //     this.permissions = result.map(permission => {
+    //       const options = actionToObject(permission.actionData)
+    //       permission.checkedAll = false
+    //       permission.selected = []
+    //       permission.indeterminate = false
+    //       permission.actionsOptions = options.map(option => {
+    //         return {
+    //           label: option.describe,
+    //           value: option.action
+    //         }
+    //       })
+    //       return permission
+    //     })
+    //   })
+    // }
   }
 }
 </script>
