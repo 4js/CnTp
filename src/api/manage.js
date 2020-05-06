@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-05-06 09:46:34
+ * @LastEditTime: 2020-05-06 10:55:58
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \CnTp\src\api\manage.js
+ */
 import { axios } from '@/utils/request'
 
 const api = {
@@ -27,7 +35,24 @@ export function getRoleList (data) {
   })
 }
 
-export function editRole (data) {
+export function deleteRole (data) {
+  return axios({
+    url: '?c=adminrole&a=deleterole&v=manager',
+    method: 'post',
+    data
+  })
+}
+
+export function updateRole (data) {
+  const affix = data.roleID ? 'updaterole' : 'addrole'
+  return axios({
+    url: `?c=adminrole&a=${affix}&v=manager`,
+    method: 'post',
+    data
+  })
+}
+
+export function updateRoleStatus (data) {
   return axios({
     url: '?c=adminrole&a=updatestatus&v=manager',
     method: 'post',

@@ -33,67 +33,38 @@
         <span v-else>停用</span>
       </template>
       <span slot="action" slot-scope="text, record">
-        <a @click="handleEdit(record)">编辑</a>
+        <a @click="showApplyModal(record)">编辑</a>
         <a-divider type="vertical" />
-        <a v-if="record.status==='1'">停用</a>
-        <a v-else>启用</a>
+        <a-popconfirm
+          :title="`确定${record.status==='1'?'停用':'启用'}该角色?`"
+          @confirm="changeRoleStatus(record)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a v-if="record.status==='1'">停用</a>
+          <a v-else>启用</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          title="确定删除该角色?"
+          @confirm="toDelete(record.role_id)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a href="#">删除</a>
+        </a-popconfirm>
         <a-divider type="vertical" />
         <a class="ant-dropdown-link">设置权限</a>
       </span>
     </a-table>
 
-    <a-modal v-model="visible" title="编辑角色" @ok="handleOk">
-      <a-form-model :model="ruleform" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-form-model-item label="Activity name">
-          <a-input v-model="ruleform.name" />
+    <a-modal v-model="addRoleModal" :title="modalTitle" @ok="handleOk">
+      <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="角色名称" prop="role_name">
+          <a-input v-model="form.role_name" />
         </a-form-model-item>
-        <a-form-model-item label="Activity zone">
-          <a-select v-model="ruleform.region" placeholder="please select your zone">
-            <a-select-option value="shanghai">
-              Zone one
-            </a-select-option>
-            <a-select-option value="beijing">
-              Zone two
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
-        <a-form-model-item label="Activity time">
-          <a-date-picker
-            v-model="ruleform.date1"
-            show-time
-            type="date"
-            placeholder="Pick a date"
-            style="width: 100%;"
-          />
-        </a-form-model-item>
-        <a-form-model-item label="Instant delivery">
-          <a-switch v-model="ruleform.delivery" />
-        </a-form-model-item>
-        <a-form-model-item label="Activity type">
-          <a-checkbox-group v-model="ruleform.type">
-            <a-checkbox value="1" name="type">
-              Online
-            </a-checkbox>
-            <a-checkbox value="2" name="type">
-              Promotion
-            </a-checkbox>
-            <a-checkbox value="3" name="type">
-              Offline
-            </a-checkbox>
-          </a-checkbox-group>
-        </a-form-model-item>
-        <a-form-model-item label="Resources">
-          <a-radio-group v-model="ruleform.resource">
-            <a-radio value="1">
-              Sponsor
-            </a-radio>
-            <a-radio value="2">
-              Venue
-            </a-radio>
-          </a-radio-group>
-        </a-form-model-item>
-        <a-form-model-item label="Activity form">
-          <a-input v-model="ruleform.desc" type="textarea" />
+        <a-form-model-item label="唯一key" prop="mark">
+          <a-input v-model="form.mark" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -102,7 +73,7 @@
 
 <script>
 import { STable } from '@/components'
-import { getRoleList } from '@/api/manage'
+import { getRoleList, updateRoleStatus, updateRole, deleteRole } from '@/api/manage'
 import RoleModal from './modules/RoleModal'
 
 export default {
@@ -114,10 +85,6 @@ export default {
   data () {
     return {
       description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
-
-      visible: false,
-
-      form: null,
       mdl: {},
       // 查询参数
       queryParam: {},
@@ -153,43 +120,70 @@ export default {
       ],
       data: [],
       // formmodal
+      modalTitle: '新增角色',
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
-      ruleform: {
-        name: '',
-        region: undefined,
-        date1: undefined,
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+      addRoleModal: false,
+      rules: {
+        role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        mark: [{ required: true, message: '请输入备注', trigger: 'blur' }]
+      },
+      form: {
+        role_name: '',
+        mark: ''
       }
     }
   },
   created () {
-    getRoleList().then(res => {
-      console.log(res)
-      this.data = res.data.list
-    })
+    this.getRole()
   },
   methods: {
-    handleEdit (record) {
-      this.mdl = Object.assign({}, record)
-      this.mdl.permissions = []
-
-      // this.mdl.permissions.forEach(permission => {
-      //   permission.actionsOptions = permission.actionEntitySet.map(action => {
-      //     return { label: action.describe, value: action.action, defaultCheck: action.defaultCheck }
-      //   })
-      // })
-
-      console.log(this.mdl)
-      this.visible = true
+    showApplyModal (role = null) {
+      if (role) {
+        this.form = {
+          roleName: role.roleName,
+          notes: role.notes
+        }
+      }
+      this.modalTitle = role ? '修改角色' : '新增角色'
+      this.mdl = Object.assign({}, role)
+      this.addRoleModal = true
     },
     handleOk () {
+      this.$refs.addRoleForm.validate(valid => {
+        if (valid) {
+          const roleData = this.form
+          const tips = this.mdl ? '修改成功' : '添加成功'
+          if (this.mdl) roleData.role_iD = this.mdl.role_iD
+          updateRole(roleData).then(res => {
+            if (res) {
+              this.getRole()
+              this.$message.success(tips)
+              this.addRoleModal = false
+            }
+          })
+        }
+      })
+    },
+    getRole () {
       getRoleList().then(res => {
         console.log(res)
         this.data = res.data.list
+      })
+    },
+    toDelete (id) {
+      deleteRole({ role_id: id }).then(res => {
+        this.$message.success('删除成功')
+        this.getRole()
+      })
+    },
+    changeRoleStatus (role) {
+      const { role_id: roleID, status } = role
+      updateRoleStatus({ role_id: roleID, status: status === '1' ? '2' : '1' }).then(res => {
+        if (res) {
+          this.getRole()
+          this.$message.success('修改成功')
+        }
       })
     }
   }
