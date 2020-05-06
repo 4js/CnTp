@@ -88,7 +88,7 @@ export const asyncRouterMap = [
             path: '/other/user-list',
             name: 'UserList',
             component: () => import('@/views/other/UserList'),
-            meta: { title: '用户列表', keepAlive: true }
+            meta: { title: '管理员列表', keepAlive: true }
           },
           {
             path: '/other/role-list',

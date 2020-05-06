@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-05-06 09:46:34
- * @LastEditTime: 2020-05-06 10:55:58
+ * @LastEditTime: 2020-05-06 15:38:58
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \CnTp\src\api\manage.js
@@ -27,6 +27,39 @@ export function getUserList (parameter) {
   })
 }
 
+export function getAdminList (data) {
+  return axios({
+    url: '?c=admin&a=selectlist&v=manager',
+    method: 'post',
+    data
+  })
+}
+
+export function updateAdminStatus (data) {
+  return axios({
+    url: '?c=admin&a=updatestatus&v=manager',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAdmin (data) {
+  return axios({
+    url: '?c=admin&a=deleteadmin&v=manager',
+    method: 'post',
+    data
+  })
+}
+
+export function updateAdmin (data) {
+  const affix = data.admin_id ? 'updateinfo' : 'add'
+  return axios({
+    url: `?c=admin&a=${affix}&v=manager`,
+    method: 'post',
+    data
+  })
+}
+
 export function getRoleList (data) {
   return axios({
     url: '?c=adminrole&a=selectrole&v=manager',
@@ -44,7 +77,7 @@ export function deleteRole (data) {
 }
 
 export function updateRole (data) {
-  const affix = data.roleID ? 'updaterole' : 'addrole'
+  const affix = data.role_id ? 'updaterole' : 'addrole'
   return axios({
     url: `?c=adminrole&a=${affix}&v=manager`,
     method: 'post',

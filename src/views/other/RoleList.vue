@@ -154,7 +154,7 @@ export default {
         if (valid) {
           const roleData = this.form
           const tips = this.mdl ? '修改成功' : '添加成功'
-          if (this.mdl) roleData.role_iD = this.mdl.role_iD
+          if (this.mdl) roleData.role_id = this.mdl.role_id
           updateRole(roleData).then(res => {
             if (res) {
               this.getRole()

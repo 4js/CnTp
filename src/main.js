@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-05-06 09:46:34
+ * @LastEditTime: 2020-05-06 15:46:17
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \CnTp\src\main.js
+ */
 // with polyfills
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
@@ -18,12 +26,14 @@ import './core/lazy_use'
 import './utils/filter' // global filter
 import './components/global.less'
 import { Dialog } from '@/components'
+import { FormModel } from 'ant-design-vue'
 
 Vue.config.productionTip = false
 
 // mount axios Vue.$http and this.$http
 Vue.use(VueAxios)
 Vue.use(Dialog)
+Vue.use(FormModel)
 
 new Vue({
   router,
