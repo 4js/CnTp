@@ -27,7 +27,7 @@
       </a-form>
     </div>
 
-    <a-table row-key="role_id" :columns="columns" :data-source="data">
+    <a-table row-key="admin_id" :columns="columns" :data-source="data">
       <template slot="status" slot-scope="text">
         <span v-if="text==='1'">启用</span>
         <span v-else>停用</span>
@@ -54,26 +54,38 @@
           <a href="#">删除</a>
         </a-popconfirm>
         <a-divider type="vertical" />
-        <a class="ant-dropdown-link">绑定角色</a>
+        <a class="ant-dropdown-link" @click="showRoleModal(record)">绑定角色</a>
       </span>
     </a-table>
 
-    <a-modal v-model="addRoleModal" :title="modalTitle" @ok="handleOk">
+    <a-modal v-model="addAdminModal" :title="modalTitle" @ok="handleOk">
       <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-form-model-item label="管理员名称" prop="role_name">
-          <a-input v-model="form.role_name" />
+        <a-form-model-item label="姓名" prop="truename">
+          <a-input v-model="form.truename" />
         </a-form-model-item>
-        <a-form-model-item label="唯一key" prop="mark">
+        <a-form-model-item label="手机号" prop="tel">
+          <a-input v-model="form.tel" />
+        </a-form-model-item>
+        <a-form-model-item label="登录账号" prop="username">
+          <a-input v-model="form.username" />
+        </a-form-model-item>
+        <a-form-model-item label="登录密码" prop="password">
+          <a-input v-model="form.password" />
+        </a-form-model-item>
+        <a-form-model-item label="账号备注" prop="mark">
           <a-input v-model="form.mark" />
         </a-form-model-item>
       </a-form-model>
+    </a-modal>
+    <a-modal v-model="bindRoleModal" title="绑定角色" @ok="bindOk">
+      <a-checkbox-group v-model="checkedList" name="role_name" value="role_id" :options="roleList" />
     </a-modal>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import { getAdminList, updateAdminStatus, updateAdmin, deleteAdmin } from '@/api/manage'
+import { getAdminList, updateAdminStatus, updateAdmin, deleteAdmin, getRoleList } from '@/api/manage'
 import RoleModal from './modules/RoleModal'
 
 export default {
@@ -107,6 +119,14 @@ export default {
           dataIndex: 'tel'
         },
         {
+          title: '登录次数',
+          dataIndex: 'loginnum'
+        },
+        {
+          title: '最后登录时间',
+          dataIndex: 'lastlogintime'
+        },
+        {
           title: '状态',
           dataIndex: 'status',
           scopedSlots: { customRender: 'status' }
@@ -127,35 +147,56 @@ export default {
         }
       ],
       data: [],
+      roleList: [],
       // formmodal
       modalTitle: '新增管理员',
       labelCol: { span: 4 },
       wrapperCol: { span: 14 },
       addAdminModal: false,
       rules: {
-        role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        username: [{ required: true, message: '请输入登录账号', trigger: 'blur' }],
+        tel: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+        truename: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
         mark: [{ required: true, message: '请输入备注', trigger: 'blur' }]
       },
       form: {
-        role_name: '',
+        truename: '',
+        username: '',
+        password: '',
+        tel: '',
         mark: ''
-      }
+      },
+      // roleModal
+      bindRoleModal: false,
+      checkedList: [],
+      plainOptions: ['Apple', 'Pear', 'Orange']
     }
   },
   created () {
     this.getAdmin()
+    getRoleList().then(res => {
+      this.roleList = res.data.list.map(item => { return { 'label': item.role_name, 'value': item.role_id } })
+    })
   },
   methods: {
     showApplyModal (admin = null) {
       if (admin) {
         this.form = {
-          roleName: admin.username,
-          notes: admin.notes
+          truename: admin.truename,
+          username: admin.username,
+          password: admin.password,
+          tel: admin.tel,
+          mark: admin.mark
         }
       }
       this.modalTitle = admin ? '修改管理员' : '新增管理员'
       this.mdl = Object.assign({}, admin)
       this.addAdminModal = true
+    },
+    showRoleModal (admin) {
+      this.mdl = Object.assign({}, admin)
+      this.bindRoleModal = true
     },
     handleOk () {
       this.$refs.addRoleForm.validate(valid => {
@@ -172,6 +213,17 @@ export default {
           })
         }
       })
+    },
+    bindOk () {
+      // const { admin_id: adminID } = this.mdl
+      console.log(this.checkedList)
+      // adminRole({ targetadmin_id: adminID, role_id: this.checkedList }).then(res => {
+      //   if (res) {
+      //     this.getAdmin()
+      //     this.$message.success('绑定成功')
+      //     this.bindRoleModal = false
+      //   }
+      // })
     },
     getAdmin () {
       getAdminList().then(res => {

@@ -52,7 +52,14 @@ service.interceptors.request.use(config => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
-  return response.data
+  if (response.data.code === 1) {
+    return response.data
+  } else {
+    notification.error({
+      message: 'Forbidden',
+      description: response.data.message
+    })
+  }
 }, err)
 
 const installer = {

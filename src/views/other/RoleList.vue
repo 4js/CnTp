@@ -21,6 +21,7 @@
             <span class="table-page-search-submitButtons">
               <a-button type="primary">查询</a-button>
               <a-button style="margin-left: 8px">重置</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="showApplyModal">新增角色</a-button>
             </span>
           </a-col>
         </a-row>
@@ -63,7 +64,7 @@
         <a-form-model-item label="角色名称" prop="role_name">
           <a-input v-model="form.role_name" />
         </a-form-model-item>
-        <a-form-model-item label="唯一key" prop="mark">
+        <a-form-model-item label="角色描述" prop="mark">
           <a-input v-model="form.mark" />
         </a-form-model-item>
       </a-form-model>
@@ -141,8 +142,8 @@ export default {
     showApplyModal (role = null) {
       if (role) {
         this.form = {
-          roleName: role.roleName,
-          notes: role.notes
+          role_name: role.role_name,
+          mark: role.mark
         }
       }
       this.modalTitle = role ? '修改角色' : '新增角色'

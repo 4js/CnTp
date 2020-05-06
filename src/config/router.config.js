@@ -56,9 +56,9 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/list/table-list',
-            name: 'TableListWrapper',
+            name: 'QueryList',
             hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
-            component: () => import('@/views/list/TableList'),
+            component: () => import('@/views/list/QueryList'),
             meta: { title: '领导列表', keepAlive: true, permission: [ 'table' ] }
           },
           {
@@ -70,7 +70,7 @@ export const asyncRouterMap = [
           {
             path: '/list/card',
             name: 'CardList',
-            component: () => import('@/views/list/TableList'),
+            component: () => import('@/views/list/CardList'),
             meta: { title: '用户列表', keepAlive: true, permission: [ 'table' ] }
           }
         ]

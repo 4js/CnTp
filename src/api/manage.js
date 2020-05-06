@@ -60,6 +60,14 @@ export function updateAdmin (data) {
   })
 }
 
+export function adminRole (data) {
+  return axios({
+    url: '?c=admin&a=bindrole&v=manager',
+    method: 'post',
+    data
+  })
+}
+
 export function getRoleList (data) {
   return axios({
     url: '?c=adminrole&a=selectrole&v=manager',

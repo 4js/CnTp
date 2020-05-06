@@ -1,150 +1,194 @@
 <template>
-  <div class="card-list" ref="content">
-    <a-list
-      rowKey="id"
-      :grid="{gutter: 24, lg: 3, md: 2, sm: 1, xs: 1}"
-      :dataSource="dataSource"
-    >
-      <a-list-item slot="renderItem" slot-scope="item">
-        <template v-if="!item || item.id === undefined">
-          <a-button class="new-btn" type="dashed">
-            <a-icon type="plus"/>
-            新增产品
-          </a-button>
-        </template>
-        <template v-else>
-          <a-card :hoverable="true">
-            <a-card-meta>
-              <a slot="title">{{ item.title }}</a>
-              <a-avatar class="card-avatar" slot="avatar" :src="item.avatar" size="large"/>
-              <div class="meta-content" slot="description">{{ item.content }}</div>
-            </a-card-meta>
-            <template class="ant-card-actions" slot="actions">
-              <a>操作一</a>
-              <a>操作二</a>
-            </template>
-          </a-card>
-        </template>
-      </a-list-item>
-    </a-list>
-  </div>
+  <a-card :bordered="false">
+    <div class="table-page-search-wrapper">
+      <a-form layout="inline">
+        <a-row :gutter="48">
+          <a-col :md="8" :sm="24">
+            <a-form-item label="角色ID">
+              <a-input placeholder="请输入"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <a-form-item label="状态">
+              <a-select placeholder="请选择" default-value="0">
+                <a-select-option value="0">全部</a-select-option>
+                <a-select-option value="1">正常</a-select-option>
+                <a-select-option value="2">禁用</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24">
+            <span class="table-page-search-submitButtons">
+              <a-button type="primary">查询</a-button>
+              <a-button style="margin-left: 8px">重置</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="showApplyModal">新增角色</a-button>
+            </span>
+          </a-col>
+        </a-row>
+      </a-form>
+    </div>
+
+    <a-table row-key="role_id" :columns="columns" :data-source="data">
+      <template slot="status" slot-scope="text">
+        <span v-if="text==='1'">启用</span>
+        <span v-else>停用</span>
+      </template>
+      <span slot="action" slot-scope="text, record">
+        <a @click="showApplyModal(record)">编辑</a>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          :title="`确定${record.status==='1'?'停用':'启用'}该角色?`"
+          @confirm="changeRoleStatus(record)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a v-if="record.status==='1'">停用</a>
+          <a v-else>启用</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          title="确定删除该角色?"
+          @confirm="toDelete(record.role_id)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a href="#">删除</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a class="ant-dropdown-link">设置权限</a>
+      </span>
+    </a-table>
+
+    <a-modal v-model="addRoleModal" :title="modalTitle" @ok="handleOk">
+      <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="角色名称" prop="role_name">
+          <a-input v-model="form.role_name" />
+        </a-form-model-item>
+        <a-form-model-item label="角色描述" prop="mark">
+          <a-input v-model="form.mark" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
+  </a-card>
 </template>
 
 <script>
-
-const dataSource = []
-dataSource.push({})
-for (let i = 0; i < 11; i++) {
-  dataSource.push({
-    id: i,
-    title: 'Alipay',
-    avatar: 'https://gw.alipayobjects.com/zos/rmsportal/WdGqmHpayyMjiEhcKoVE.png',
-    content: '在中台产品的研发过程中，会出现不同的设计规范和实现方式，但其中往往存在很多类似的页面和组件，这些类似的组件会被抽离成一套标准规范。'
-  })
-}
+import { updateRoleStatus, updateRole, deleteRole } from '@/api/manage'
+import { getUserList } from '@/api/list'
 
 export default {
-  name: 'CardList',
+  name: 'TableList',
   data () {
     return {
-      description: '段落示意：蚂蚁金服务设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态， 提供跨越设计与开发的体验解决方案。',
-      linkList: [
+      description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
+      mdl: {},
+      // 查询参数
+      queryParam: {},
+      // 表头
+      columns: [
         {
-          icon: 'rocket',
-          href: '#',
-          title: '快速开始',
-          // 回调，可不写
-          callback: () => {
-            // this.$message.info('快速开始被单击')
-            this.testFun()
-            console.log('call[\'快速开始\'] action')
-          }
+          title: '用户id',
+          dataIndex: 'user_id'
         },
-        { icon: 'info-circle-o', href: '#', title: '产品简介' },
-        { icon: 'file-text', href: '#', title: '产品文档' }
+        {
+          title: '用户名',
+          dataIndex: 'member_name'
+        },
+        {
+          title: '手机号',
+          dataIndex: 'tel'
+        },
+        {
+          title: '打卡数',
+          dataIndex: 'clock_in_count'
+        },
+        {
+          title: '抽奖数',
+          dataIndex: 'raffle_count'
+        },
+        {
+          title: '新增时间',
+          dataIndex: 'itime',
+          sorter: true
+        },
+        {
+          title: '用户层级',
+          dataIndex: 'level'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
+        }
       ],
-      extraImage: 'https://gw.alipayobjects.com/zos/rmsportal/RzwpdLnhmvDJToTdfDPe.png',
-      dataSource
+      data: [],
+      // formmodal
+      modalTitle: '新增角色',
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
+      addRoleModal: false,
+      rules: {
+        role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        mark: [{ required: true, message: '请输入备注', trigger: 'blur' }]
+      },
+      form: {
+        role_name: '',
+        mark: ''
+      }
     }
   },
+  created () {
+    this.getList()
+  },
   methods: {
-    testFun () {
-      this.$message.info('快速开始被点击！')
+    showApplyModal (role = null) {
+      if (role) {
+        this.form = {
+          role_name: role.role_name,
+          mark: role.mark
+        }
+      }
+      this.modalTitle = role ? '修改角色' : '新增角色'
+      this.mdl = Object.assign({}, role)
+      this.addRoleModal = true
+    },
+    handleOk () {
+      this.$refs.addRoleForm.validate(valid => {
+        if (valid) {
+          const roleData = this.form
+          const tips = this.mdl ? '修改成功' : '添加成功'
+          if (this.mdl) roleData.role_id = this.mdl.role_id
+          updateRole(roleData).then(res => {
+            if (res) {
+              this.getRole()
+              this.$message.success(tips)
+              this.addRoleModal = false
+            }
+          })
+        }
+      })
+    },
+    getList () {
+      getUserList({}).then(res => {
+        console.log(res)
+        this.data = res.data.list
+      })
+    },
+    toDelete (id) {
+      deleteRole({ role_id: id }).then(res => {
+        this.$message.success('删除成功')
+        this.getRole()
+      })
+    },
+    changeRoleStatus (role) {
+      const { role_id: roleID, status } = role
+      updateRoleStatus({ role_id: roleID, status: status === '1' ? '2' : '1' }).then(res => {
+        if (res) {
+          this.getRole()
+          this.$message.success('修改成功')
+        }
+      })
     }
   }
 }
 </script>
-
-<style lang="less" scoped>
-  @import "~@/components/index.less";
-
-  .card-list {
-    /deep/ .ant-card-body:hover {
-      .ant-card-meta-title>a {
-        color: @primary-color;
-      }
-    }
-
-    /deep/ .ant-card-meta-title {
-      margin-bottom: 12px;
-
-      &>a {
-        display: inline-block;
-        max-width: 100%;
-        color: rgba(0,0,0,.85);
-      }
-    }
-
-    /deep/ .meta-content {
-      position: relative;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      height: 64px;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-
-      margin-bottom: 1em;
-    }
-  }
-
-  .card-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 48px;
-  }
-
-  .ant-card-actions {
-    background: #f7f9fa;
-
-    li {
-      float: left;
-      text-align: center;
-      margin: 12px 0;
-      color: rgba(0, 0, 0, 0.45);
-      width: 50%;
-
-      &:not(:last-child) {
-        border-right: 1px solid #e8e8e8;
-      }
-
-      a {
-        color: rgba(0, 0, 0, .45);
-        line-height: 22px;
-        display: inline-block;
-        width: 100%;
-        &:hover {
-          color: @primary-color;
-        }
-      }
-    }
-  }
-
-  .new-btn {
-    background-color: #fff;
-    border-radius: 2px;
-    width: 100%;
-    height: 188px;
-  }
-
-</style>

@@ -12,8 +12,8 @@
             <a-form-item label="状态">
               <a-select placeholder="请选择" default-value="0">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+                <a-select-option value="1">正常</a-select-option>
+                <a-select-option value="2">禁用</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -21,160 +21,87 @@
             <span class="table-page-search-submitButtons">
               <a-button type="primary">查询</a-button>
               <a-button style="margin-left: 8px">重置</a-button>
+              <a-button style="margin-left: 8px" type="primary" @click="showApplyModal">新增角色</a-button>
             </span>
           </a-col>
         </a-row>
       </a-form>
     </div>
 
-    <s-table :columns="columns" :data="loadData">
-
-      <span slot="actions" slot-scope="text, record">
-        <a-tag v-for="(action, index) in record.actionList" :key="index">{{ action.describe }}</a-tag>
-      </span>
-
-      <span slot="status" slot-scope="text">
-        {{ text | statusFilter }}
-      </span>
-
+    <a-table row-key="role_id" :columns="columns" :data-source="data">
+      <template slot="status" slot-scope="text">
+        <span v-if="text==='1'">启用</span>
+        <span v-else>停用</span>
+      </template>
       <span slot="action" slot-scope="text, record">
-        <a @click="handleEdit(record)">编辑</a>
+        <a @click="showApplyModal(record)">编辑</a>
         <a-divider type="vertical" />
-        <a-dropdown>
-          <a class="ant-dropdown-link">
-            更多 <a-icon type="down" />
-          </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
-              <a href="javascript:;">详情</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">禁用</a>
-            </a-menu-item>
-            <a-menu-item>
-              <a href="javascript:;">删除</a>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
+        <a-popconfirm
+          :title="`确定${record.status==='1'?'停用':'启用'}该角色?`"
+          @confirm="changeRoleStatus(record)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a v-if="record.status==='1'">停用</a>
+          <a v-else>启用</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a-popconfirm
+          title="确定删除该角色?"
+          @confirm="toDelete(record.role_id)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a href="#">删除</a>
+        </a-popconfirm>
+        <a-divider type="vertical" />
+        <a class="ant-dropdown-link">设置权限</a>
       </span>
-    </s-table>
+    </a-table>
 
-    <a-modal
-      title="操作"
-      :width="800"
-      v-model="visible"
-      @ok="handleOk"
-    >
-      <a-form :autoFormCreate="(form)=>{this.form = form}">
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="唯一识别码"
-          hasFeedback
-          validateStatus="success"
-        >
-          <a-input placeholder="唯一识别码" v-model="mdl.id" id="no" disabled="disabled" />
-        </a-form-item>
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="权限名称"
-          hasFeedback
-          validateStatus="success"
-        >
-          <a-input placeholder="起一个名字" v-model="mdl.name" id="permission_name" />
-        </a-form-item>
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="状态"
-          hasFeedback
-          validateStatus="warning"
-        >
-          <a-select v-model="mdl.status">
-            <a-select-option value="1">正常</a-select-option>
-            <a-select-option value="2">禁用</a-select-option>
-          </a-select>
-        </a-form-item>
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="描述"
-          hasFeedback
-        >
-          <a-textarea :rows="5" v-model="mdl.describe" placeholder="..." id="describe"/>
-        </a-form-item>
-
-        <a-divider />
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="赋予权限"
-          hasFeedback
-        >
-          <a-select
-            style="width: 100%"
-            mode="multiple"
-            v-model="mdl.actions"
-            :allowClear="true"
-          >
-            <a-select-option v-for="(action, index) in permissionList" :key="index" :value="action.value">{{ action.label }}</a-select-option>
-          </a-select>
-        </a-form-item>
-
-      </a-form>
+    <a-modal v-model="addRoleModal" :title="modalTitle" @ok="handleOk">
+      <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="角色名称" prop="role_name">
+          <a-input v-model="form.role_name" />
+        </a-form-model-item>
+        <a-form-model-item label="角色描述" prop="mark">
+          <a-input v-model="form.mark" />
+        </a-form-model-item>
+      </a-form-model>
     </a-modal>
-
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
+import { getRoleList, updateRoleStatus, updateRole, deleteRole } from '@/api/manage'
+import RoleModal from './modules/RoleModal'
 
 export default {
   name: 'TableList',
   components: {
-    STable
+    STable,
+    RoleModal
   },
   data () {
     return {
       description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
-
-      visible: false,
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 5 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-      },
-      form: null,
       mdl: {},
-
-      // 高级搜索 展开/关闭
-      advanced: false,
       // 查询参数
       queryParam: {},
       // 表头
       columns: [
         {
-          title: '唯一识别码',
-          dataIndex: 'id'
+          title: '角色id',
+          dataIndex: 'role_id'
         },
         {
-          title: '权限名称',
-          dataIndex: 'name'
+          title: '角色名称',
+          dataIndex: 'role_name'
         },
         {
-          title: '可操作权限',
-          dataIndex: 'actions',
-          scopedSlots: { customRender: 'actions' }
+          title: '角色备注',
+          dataIndex: 'mark'
         },
         {
           title: '状态',
@@ -182,91 +109,84 @@ export default {
           scopedSlots: { customRender: 'status' }
         },
         {
+          title: '创建时间',
+          dataIndex: 'utime',
+          sorter: true
+        },
+        {
           title: '操作',
-          width: '150px',
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
         }
       ],
-      // 向后端拉取可以用的操作列表
-      permissionList: null,
-      // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        return this.$http.get('/permission', {
-          params: Object.assign(parameter, this.queryParam)
-        }).then(res => {
-          const result = res.result
-          result.data.map(permission => {
-            permission.actionList = JSON.parse(permission.actionData)
-            return permission
-          })
-          return result
-        })
+      data: [],
+      // formmodal
+      modalTitle: '新增角色',
+      labelCol: { span: 4 },
+      wrapperCol: { span: 14 },
+      addRoleModal: false,
+      rules: {
+        role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        mark: [{ required: true, message: '请输入备注', trigger: 'blur' }]
       },
-
-      selectedRowKeys: [],
-      selectedRows: []
-    }
-  },
-  filters: {
-    statusFilter (status) {
-      const statusMap = {
-        1: '正常',
-        2: '禁用'
+      form: {
+        role_name: '',
+        mark: ''
       }
-      return statusMap[status]
     }
   },
   created () {
-    this.loadPermissionList()
+    this.getRole()
   },
   methods: {
-    loadPermissionList () {
-      // permissionList
-      new Promise(resolve => {
-        const data = [
-          { label: '新增', value: 'add', defaultChecked: false },
-          { label: '查询', value: 'get', defaultChecked: false },
-          { label: '修改', value: 'update', defaultChecked: false },
-          { label: '列表', value: 'query', defaultChecked: false },
-          { label: '删除', value: 'delete', defaultChecked: false },
-          { label: '导入', value: 'import', defaultChecked: false },
-          { label: '导出', value: 'export', defaultChecked: false }
-        ]
-        setTimeout(resolve(data), 1500)
-      }).then(res => {
-        this.permissionList = res
-      })
-    },
-    handleEdit (record) {
-      this.mdl = Object.assign({}, record)
-      console.log(this.mdl)
-      this.visible = true
+    showApplyModal (role = null) {
+      if (role) {
+        this.form = {
+          role_name: role.role_name,
+          mark: role.mark
+        }
+      }
+      this.modalTitle = role ? '修改角色' : '新增角色'
+      this.mdl = Object.assign({}, role)
+      this.addRoleModal = true
     },
     handleOk () {
-
+      this.$refs.addRoleForm.validate(valid => {
+        if (valid) {
+          const roleData = this.form
+          const tips = this.mdl ? '修改成功' : '添加成功'
+          if (this.mdl) roleData.role_id = this.mdl.role_id
+          updateRole(roleData).then(res => {
+            if (res) {
+              this.getRole()
+              this.$message.success(tips)
+              this.addRoleModal = false
+            }
+          })
+        }
+      })
     },
-    onChange (selectedRowKeys, selectedRows) {
-      this.selectedRowKeys = selectedRowKeys
-      this.selectedRows = selectedRows
+    getRole () {
+      getRoleList().then(res => {
+        console.log(res)
+        this.data = res.data.list
+      })
     },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
+    toDelete (id) {
+      deleteRole({ role_id: id }).then(res => {
+        this.$message.success('删除成功')
+        this.getRole()
+      })
+    },
+    changeRoleStatus (role) {
+      const { role_id: roleID, status } = role
+      updateRoleStatus({ role_id: roleID, status: status === '1' ? '2' : '1' }).then(res => {
+        if (res) {
+          this.getRole()
+          this.$message.success('修改成功')
+        }
+      })
     }
-  },
-  watch: {
-    /*
-      'selectedRows': function (selectedRows) {
-        this.needTotalList = this.needTotalList.map(item => {
-          return {
-            ...item,
-            total: selectedRows.reduce( (sum, val) => {
-              return sum + val[item.dataIndex]
-            }, 0)
-          }
-        })
-      }
-      */
   }
 }
 </script>
