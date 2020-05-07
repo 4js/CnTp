@@ -72,6 +72,12 @@ export const asyncRouterMap = [
             name: 'CardList',
             component: () => import('@/views/list/CardList'),
             meta: { title: '用户列表', keepAlive: true, permission: [ 'table' ] }
+          },
+          {
+            path: '/list/notice',
+            name: 'NoticeList',
+            component: () => import('@/views/list/NoticeList'),
+            meta: { title: '区域公告', keepAlive: true, permission: [ 'table' ] }
           }
         ]
       },

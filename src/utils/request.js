@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
+import router from '../router'
 import store from '@/store'
 import qs from 'qs'
 import notification from 'ant-design-vue/es/notification'
@@ -54,6 +55,12 @@ service.interceptors.request.use(config => {
 service.interceptors.response.use((response) => {
   if (response.data.code === 1) {
     return response.data
+  } else if (response.data.code === '-1003') {
+    notification.error({
+      message: '登录失效',
+      description: '请重新登录'
+    })
+    router.redirect('/user/login')
   } else {
     notification.error({
       message: 'Forbidden',

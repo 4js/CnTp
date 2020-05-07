@@ -21,24 +21,25 @@
             <span class="table-page-search-submitButtons">
               <a-button type="primary">查询</a-button>
               <a-button style="margin-left: 8px">重置</a-button>
-              <a-button style="margin-left: 8px" type="primary" @click="showApplyModal">新增员工</a-button>
             </span>
           </a-col>
         </a-row>
       </a-form>
     </div>
 
-    <a-table row-key="role_id" :columns="columns" :data-source="data">
-      <template slot="status" slot-scope="text">
-        <span v-if="text==='1'">启用</span>
-        <span v-else>停用</span>
-      </template>
+    <a-table row-key="id" :columns="columns" :data-source="data">
+      <span slot="action" slot-scope="text, record">
+        <a @click="showApplyModal(record)">编辑</a>
+      </span>
     </a-table>
 
-    <a-modal v-model="addRoleModal" title="导入员工" @ok="handleOk">
+    <a-modal v-model="addRoleModal" title="编辑" @ok="handleOk">
       <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
-        <a-form-model-item label="员工列表" prop="job_numbers">
-          <a-textarea v-model="form.job_numbers" placeholder="233,23,323" :rows="4" />
+        <a-form-model-item label="区域" prop="area_name">
+          <a-input v-model="form.area_name" disabled/>
+        </a-form-model-item>
+        <a-form-model-item label="公告" prop="notice_content">
+          <a-textarea v-model="form.notice_content" placeholder="233,23,323" :rows="4" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -46,66 +47,57 @@
 </template>
 
 <script>
-import { getMemberList, addJobNumber } from '@/api/list'
+import { getNoticeList, updateNotice } from '@/api/list'
 
 export default {
   name: 'TableList',
   data () {
     return {
       description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
+      mdl: {},
       // 查询参数
       queryParam: {},
       // 表头
       columns: [
         {
-          title: '员工id',
+          title: '区域id',
           dataIndex: 'id'
-        },
-        {
-          title: '工号',
-          dataIndex: 'job_number'
-        },
-        {
-          title: '用户名',
-          dataIndex: 'member_name'
-        },
-        {
-          title: '手机号',
-          dataIndex: 'tel'
         },
         {
           title: '区域名',
           dataIndex: 'area_name'
         },
         {
-          title: '一级用户人数',
-          dataIndex: 'first_user_count'
+          title: '公告内容',
+          dataIndex: 'notice_content'
         },
         {
-          title: '二级用户人数',
-          dataIndex: 'second_user_count'
-        },
-        {
-          title: '绑定工号时间',
-          dataIndex: 'bind_time',
-          sorter: true
-        },
-        {
-          title: '新增工号时间',
+          title: '新增时间',
           dataIndex: 'itime',
           sorter: true
+        },
+        {
+          title: '更新时间',
+          dataIndex: 'utime'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          scopedSlots: { customRender: 'action' }
         }
       ],
       data: [],
-      // formmodal
+      // model
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
       addRoleModal: false,
       rules: {
-        job_numbers: [{ required: true, message: '请输入员工列表', trigger: 'blur' }]
+        notice_content: [{ required: true, message: '请输入公告内容', trigger: 'blur' }]
       },
       form: {
-        job_numbers: ''
+        notice_content: '',
+        area_name: '',
+        area_id: ''
       }
     }
   },
@@ -113,28 +105,34 @@ export default {
     this.getList()
   },
   methods: {
-    showApplyModal () {
-      this.form = {
-        job_numbers: ''
+    getList () {
+      getNoticeList({}).then(res => {
+        this.data = res.data.list
+      })
+    },
+    showApplyModal (notice) {
+      if (notice) {
+        this.form = {
+          notice_content: notice.notice_content,
+          area_id: notice.id,
+          area_name: notice.area_name
+        }
       }
       this.addRoleModal = true
     },
     handleOk () {
       this.$refs.addRoleForm.validate(valid => {
         if (valid) {
-          addJobNumber(this.form).then(res => {
+          const noticeData = Object.assign({}, this.form)
+          delete noticeData.area_name
+          updateNotice(noticeData).then(res => {
             if (res) {
               this.getList()
-              this.$message.success('添加成功')
+              this.$message.success('更新成功')
               this.addRoleModal = false
             }
           })
         }
-      })
-    },
-    getList () {
-      getMemberList({}).then(res => {
-        this.data = res.data.list
       })
     }
   }

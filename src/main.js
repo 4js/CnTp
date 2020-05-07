@@ -22,17 +22,18 @@ import { VueAxios } from './utils/request'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use'
-// import './permission' // permission control
+import './permission' // permission control
 import './utils/filter' // global filter
 import './components/global.less'
 import { Dialog } from '@/components'
-import { FormModel } from 'ant-design-vue'
+import { FormModel, Cascader } from 'ant-design-vue'
 
 Vue.config.productionTip = false
 
 // mount axios Vue.$http and this.$http
 Vue.use(VueAxios)
 Vue.use(Dialog)
+Vue.use(Cascader)
 Vue.use(FormModel)
 
 new Vue({
