@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-05-06 09:46:34
- * @LastEditTime: 2020-05-06 15:46:17
+ * @LastEditTime: 2020-05-09 16:59:44
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \CnTp\src\main.js
@@ -26,7 +26,7 @@ import './permission' // permission control
 import './utils/filter' // global filter
 import './components/global.less'
 import { Dialog } from '@/components'
-import { FormModel, Cascader } from 'ant-design-vue'
+import { FormModel, Cascader, Tree } from 'ant-design-vue'
 
 Vue.config.productionTip = false
 
@@ -34,6 +34,7 @@ Vue.config.productionTip = false
 Vue.use(VueAxios)
 Vue.use(Dialog)
 Vue.use(Cascader)
+Vue.use(Tree)
 Vue.use(FormModel)
 
 new Vue({

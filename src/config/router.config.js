@@ -101,19 +101,19 @@ export const asyncRouterMap = [
             name: 'RoleList',
             component: () => import('@/views/other/RoleList'),
             meta: { title: '角色列表', keepAlive: true }
-          },
+          }
           // {
           //   path: '/other/list/system-role',
           //   name: 'SystemRole',
           //   component: () => import('@/views/role/RoleList'),
           //   meta: { title: '角色列表2', keepAlive: true }
           // },
-          {
-            path: '/other/permission-list',
-            name: 'PermissionList',
-            component: () => import('@/views/other/PermissionList'),
-            meta: { title: '权限列表', keepAlive: true }
-          }
+          // {
+          //   path: '/other/permission-list',
+          //   name: 'PermissionList',
+          //   component: () => import('@/views/other/PermissionList'),
+          //   meta: { title: '权限列表', keepAlive: true }
+          // }
         ]
       }
     ]

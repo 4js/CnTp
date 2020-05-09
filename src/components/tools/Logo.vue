@@ -1,3 +1,11 @@
+<!--
+ * @Author: your name
+ * @Date: 2020-05-06 09:46:34
+ * @LastEditTime: 2020-05-09 16:47:55
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: \CnTp\src\components\tools\Logo.vue
+ -->
 <template>
   <div class="logo">
     <router-link :to="{name:'dashboard'}">
@@ -18,7 +26,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: '太平人寿',
+      default: '',
       required: false
     },
     showTitle: {

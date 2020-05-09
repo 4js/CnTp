@@ -55,10 +55,10 @@
           <a href="#">删除</a>
         </a-popconfirm>
         <a-divider type="vertical" />
-        <a class="ant-dropdown-link">设置权限</a>
+        <a @click="showEditModal(record)" class="ant-dropdown-link">设置权限</a>
       </span>
     </a-table>
-
+    <!-- 维护角色 -->
     <a-modal v-model="addRoleModal" :title="modalTitle" @ok="handleOk">
       <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-model-item label="角色名称" prop="role_name">
@@ -69,12 +69,27 @@
         </a-form-model-item>
       </a-form-model>
     </a-modal>
+    <!-- 绑定权限 -->
+    <a-modal v-model="editFunctionModal" title="管理权限" @ok="manageRoleFunction">
+      <a-form-model :label-col="{ span: 0 }" :wrapper-col="{ span: 20 }">
+        <a-form-model-item>
+          <a-tree
+            v-model="checkedKeys"
+            checkable
+            autoExpandParent
+            :auto-expand-parent="false"
+            :tree-data="menuData"
+            :replace-fields="replaceFields"
+          />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import { getRoleList, updateRoleStatus, updateRole, deleteRole } from '@/api/manage'
+import { getRoleList, updateRoleStatus, updateRole, deleteRole, getPermissionList, setRolePermission } from '@/api/manage'
 import RoleModal from './modules/RoleModal'
 
 export default {
@@ -132,6 +147,14 @@ export default {
       form: {
         role_name: '',
         mark: ''
+      },
+      // 权限
+      editFunctionModal: false,
+      checkedKeys: [],
+      menuData: [],
+      replaceFields: {
+        title: 'aname',
+        key: 'apicode'
       }
     }
   },
@@ -186,6 +209,69 @@ export default {
           this.$message.success('修改成功')
         }
       })
+    },
+    // 授权
+    manageRoleFunction () {
+      const apicode = this.checkedKeys.filter(item => !item.includes('0-0')).join(',')
+      const { role_id: roleID } = this.mdl
+      setRolePermission({ role_id: roleID, apicode }).then(res => {
+        if (res) {
+          this.getRole()
+          this.$message.success('提交成功')
+          this.editFunctionModal = false
+        }
+      })
+    },
+    // 遍历获取树结构
+    getTreeData (data, checkedTree) {
+      if (data.apicode !== void 0) {
+        if (parseInt(data.is_have) === 1) {
+          checkedTree.push(data.apicode)
+        }
+        return [
+          {
+            aname: data.aname,
+            apicode: data.apicode,
+            cname: data.cname,
+            is_have: data.is_have,
+            disabled: parseInt(data.is_sys) === 1,
+            sitename: data.sitename
+          }
+        ]
+      } else {
+        return Object.keys(data).map(key => {
+          const item = data[key]
+          const children = this.getTreeData(item, checkedTree)
+          let disabled
+          if (children instanceof Array) {
+            disabled = !children.some(item => !item.disabled)
+          } else {
+            disabled = children.disabled
+          }
+          if (children.length === 1 && children[0].aname === key) {
+            return children[0]
+          } else {
+            return {
+              aname: key,
+              disabled,
+              children
+            }
+          }
+        })
+      }
+    },
+    getPermission (roleID) {
+      getPermissionList({ role_id: roleID }).then(res => {
+        console.log(res)
+        this.menuData = this.getTreeData(res.data.list, this.checkedKeys)
+        // this.menuData = res.data.list
+      })
+    },
+    // 显示管理权限modal
+    showEditModal (role) {
+      this.mdl = Object.assign({}, role)
+      this.editFunctionModal = true
+      this.getPermission(role.role_id)
     }
   }
 }

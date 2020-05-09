@@ -78,14 +78,16 @@
       </a-form-model>
     </a-modal>
     <a-modal v-model="bindRoleModal" title="绑定角色" @ok="bindOk">
-      <a-checkbox-group v-model="checkedList" name="role_name" value="role_id" :options="roleList" />
+      <a-radio-group v-model="checkedRole">
+        <a-radio v-for="item in roleList" :key="item.role_id" :value="item.role_id">{{ item.role_name }}</a-radio>
+      </a-radio-group>
     </a-modal>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import { getAdminList, updateAdminStatus, updateAdmin, deleteAdmin, getRoleList } from '@/api/manage'
+import { getAdminList, updateAdminStatus, updateAdmin, deleteAdmin, getRoleList, adminRole } from '@/api/manage'
 import RoleModal from './modules/RoleModal'
 
 export default {
@@ -169,14 +171,14 @@ export default {
       },
       // roleModal
       bindRoleModal: false,
-      checkedList: [],
+      checkedRole: '',
       plainOptions: ['Apple', 'Pear', 'Orange']
     }
   },
   created () {
     this.getAdmin()
     getRoleList().then(res => {
-      this.roleList = res.data.list.map(item => { return { 'label': item.role_name, 'value': item.role_id } })
+      this.roleList = res.data.list
     })
   },
   methods: {
@@ -196,6 +198,7 @@ export default {
     },
     showRoleModal (admin) {
       this.mdl = Object.assign({}, admin)
+      this.checkedRole = admin.role_ids ? admin.role_ids : ''
       this.bindRoleModal = true
     },
     handleOk () {
@@ -215,15 +218,14 @@ export default {
       })
     },
     bindOk () {
-      // const { admin_id: adminID } = this.mdl
-      console.log(this.checkedList)
-      // adminRole({ targetadmin_id: adminID, role_id: this.checkedList }).then(res => {
-      //   if (res) {
-      //     this.getAdmin()
-      //     this.$message.success('绑定成功')
-      //     this.bindRoleModal = false
-      //   }
-      // })
+      const { admin_id: adminID } = this.mdl
+      adminRole({ targetadmin_id: adminID, role_id: this.checkedRole }).then(res => {
+        if (res) {
+          this.getAdmin()
+          this.$message.success('绑定成功')
+          this.bindRoleModal = false
+        }
+      })
     },
     getAdmin () {
       getAdminList().then(res => {
