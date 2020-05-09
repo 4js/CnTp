@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import axios from 'axios'
-import router from '../router'
 import store from '@/store'
 import qs from 'qs'
 import notification from 'ant-design-vue/es/notification'
@@ -53,6 +52,7 @@ service.interceptors.request.use(config => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
+  console.log(response)
   if (response.data.code === 1) {
     return response.data
   } else if (response.data.code === '-1003') {
@@ -60,7 +60,11 @@ service.interceptors.response.use((response) => {
       message: '登录失效',
       description: '请重新登录'
     })
-    router.redirect('/user/login')
+    store.dispatch('Logout').then(() => {
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    })
   } else {
     notification.error({
       message: 'Forbidden',
