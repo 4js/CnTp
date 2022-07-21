@@ -1137,6 +1137,14 @@
   resolved "https://registry.npmjs.org/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
+"@simonwep/pickr@~1.7.0":
+  version "1.7.4"
+  resolved "https://registry.yarnpkg.com/@simonwep/pickr/-/pickr-1.7.4.tgz#b14fcd945890388b870cd6db4d6c78d531f25141"
+  integrity sha512-fq7jgKJT21uWGC1mARBHvvd1JYlEf93o7SuVOB4Lr0x/2UPuNC9Oe9n/GzVeg4oVtqMDfh1wIEJpsdOJEZb+3g==
+  dependencies:
+    core-js "^3.6.5"
+    nanopop "^2.1.0"
+
 "@soda/friendly-errors-webpack-plugin@^1.7.1":
   version "1.7.1"
   resolved "https://registry.npmjs.org/@soda/friendly-errors-webpack-plugin/-/friendly-errors-webpack-plugin-1.7.1.tgz#706f64bcb4a8b9642b48ae3ace444c70334d615d"
@@ -1970,13 +1978,14 @@ ansi-styles@^3.2.0, ansi-styles@^3.2.1:
   dependencies:
     color-convert "^1.9.0"
 
-ant-design-vue@1.5.0-rc.6:
-  version "1.5.0-rc.6"
-  resolved "https://registry.yarnpkg.com/ant-design-vue/-/ant-design-vue-1.5.0-rc.6.tgz#a9616550e0386bf7a6b1bf00aae5cadc13159967"
-  integrity sha512-ILUyMCKa2oYAaymlWNlT2gVsNBugUCLZl28pUR+RAWjxYvxxqh6PCZj6hO9gRRgdz5WvwK1Z1gi5ua2JROOZfQ==
+ant-design-vue@^1.5.4:
+  version "1.7.8"
+  resolved "https://registry.yarnpkg.com/ant-design-vue/-/ant-design-vue-1.7.8.tgz#1abbf86b68a4f5b1000bea0487b8031dc0001661"
+  integrity sha512-F1hmiS9vwbyfuFvlamdW5l9bHKqRlj9wHaGDIE41NZMWXyWy8qL0UFa/+I0Wl8gQWZCqODW5pN6Yfoyn85At3A==
   dependencies:
     "@ant-design/icons" "^2.1.1"
     "@ant-design/icons-vue" "^2.0.0"
+    "@simonwep/pickr" "~1.7.0"
     add-dom-event-listener "^1.0.2"
     array-tree-filter "^2.1.0"
     async-validator "^3.0.3"
@@ -2002,7 +2011,7 @@ ant-design-vue@1.5.0-rc.6:
     resize-observer-polyfill "^1.5.1"
     shallow-equal "^1.0.0"
     shallowequal "^1.0.2"
-    vue-ref "^1.0.4"
+    vue-ref "^2.0.0"
     warning "^4.0.0"
 
 any-promise@^1.0.0:
@@ -2659,10 +2668,15 @@ bser@^2.0.0:
   dependencies:
     node-int64 "^0.4.0"
 
-buffer-from@1.x, buffer-from@^1.0.0:
+buffer-from@1.x:
   version "1.1.1"
   resolved "https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
   integrity sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A==
+
+buffer-from@^1.0.0:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
+  integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
 buffer-indexof@^1.0.0:
   version "1.1.1"
@@ -3162,20 +3176,20 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@*, commander@^2.18.0, commander@^2.19.0, commander@^2.20.0, commander@~2.20.0:
-  version "2.20.0"
-  resolved "http://registry.npm.taobao.org/commander/download/commander-2.20.0.tgz#d58bb2b5c1ee8f87b0d340027e9e94e222c5a422"
-  integrity sha1-1YuytcHuj4ew00ACfp6U4iLFpCI=
-
-commander@2, commander@~2.19.0:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
-  integrity sha512-6tvAOO+D6OENvRAh524Dh9jcfKTYDQAqvqezbCW82xj5X0pSrcpxtvRKHLG0yBY6SD7PSDrJaj+0AiOcKVd1Xg==
+commander@*, commander@2, commander@^2.18.0, commander@^2.19.0, commander@^2.20.0, commander@~2.20.0:
+  version "2.20.3"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
+  integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
 commander@2.17.x:
   version "2.17.1"
   resolved "https://registry.npmjs.org/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
   integrity sha512-wPMUt6FnH2yzG95SA6mzjQOEKUU3aLaDEmzs1ti+1E9h+CsrZghRlqEM/EJ4KscsQVG8uNN4uVreUeT8+drlgg==
+
+commander@~2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
+  integrity sha512-6tvAOO+D6OENvRAh524Dh9jcfKTYDQAqvqezbCW82xj5X0pSrcpxtvRKHLG0yBY6SD7PSDrJaj+0AiOcKVd1Xg==
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -3376,6 +3390,11 @@ core-js@^3.1.2:
   version "3.3.2"
   resolved "https://registry.npm.taobao.org/core-js/download/core-js-3.3.2.tgz?cache=0&sync_timestamp=1571060583912&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.3.2.tgz#cd42da1d7b0bb33ef11326be3a721934277ceb42"
   integrity sha1-zULaHXsLsz7xEya+OnIZNCd860I=
+
+core-js@^3.6.5:
+  version "3.23.5"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.23.5.tgz#1f82b0de5eece800827a2f59d597509c67650475"
+  integrity sha512-7Vh11tujtAZy82da4duVreQysIoO2EvVrur7y6IzZkH1IHPSekuDi8Vuw1+YKjkbfWLRD7Nc9ICQ/sIUDutcyg==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -7532,6 +7551,11 @@ nanomatch@^1.2.9:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
+nanopop@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/nanopop/-/nanopop-2.1.0.tgz#23476513cee2405888afd2e8a4b54066b70b9e60"
+  integrity sha512-jGTwpFRexSH+fxappnGQtN9dspgE2ipa1aOjtR24igG0pv6JCxImIAmrLRHX+zUF5+1wtsFVbKyfP51kIGAVNw==
+
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
@@ -9840,18 +9864,10 @@ source-map-support@^0.3.2:
   dependencies:
     source-map "0.1.32"
 
-source-map-support@^0.5.6:
-  version "0.5.12"
-  resolved "https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.12.tgz#b4f3b10d51857a5af0138d3ce8003b201613d599"
-  integrity sha512-4h2Pbvyy15EE02G+JOZpUCmqWJuqrs+sEkzewTm++BPi7Hvn/HwcqLAcNxYAyI0x13CpPPn+kMjl+hplXMHITQ==
-  dependencies:
-    buffer-from "^1.0.0"
-    source-map "^0.6.0"
-
-source-map-support@~0.5.12:
-  version "0.5.13"
-  resolved "https://registry.npm.taobao.org/source-map-support/download/source-map-support-0.5.13.tgz#31b24a9c2e73c2de85066c0feb7d44767ed52932"
-  integrity sha1-MbJKnC5zwt6FBmwP631Edn7VKTI=
+source-map-support@^0.5.6, source-map-support@~0.5.12:
+  version "0.5.21"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.21.tgz#04fe7c7f9e1ed2d662233c28cb2b35b9f63f6e4f"
+  integrity sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==
   dependencies:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
@@ -10323,19 +10339,10 @@ terser-webpack-plugin@^2.1.2:
     terser "^4.3.8"
     webpack-sources "^1.4.3"
 
-terser@^4.1.2:
-  version "4.2.1"
-  resolved "https://registry.npm.taobao.org/terser/download/terser-4.2.1.tgz#1052cfe17576c66e7bc70fcc7119f22b155bdac1"
-  integrity sha1-EFLP4XV2xm57xw/McRnyKxVb2sE=
-  dependencies:
-    commander "^2.20.0"
-    source-map "~0.6.1"
-    source-map-support "~0.5.12"
-
-terser@^4.3.8:
-  version "4.3.9"
-  resolved "https://registry.npm.taobao.org/terser/download/terser-4.3.9.tgz#e4be37f80553d02645668727777687dad26bbca8"
-  integrity sha1-5L43+AVT0CZFZocnd3aH2tJrvKg=
+terser@^4.1.2, terser@^4.3.8:
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-4.8.1.tgz#a00e5634562de2239fd404c649051bf6fc21144f"
+  integrity sha512-4GnLC0x667eJG0ewJTa6z/yXrbLGv80D9Ru6HIpCQmO+Q4PfEtBFi0ObSckqwL6VyQv/7ENJieXHo2ANmdQwgw==
   dependencies:
     commander "^2.20.0"
     source-map "~0.6.1"
@@ -10951,10 +10958,10 @@ vue-quill-editor@^3.0.6:
     object-assign "^4.1.1"
     quill "^1.3.4"
 
-vue-ref@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/vue-ref/-/vue-ref-1.0.4.tgz#c27862b15a2720cff6b792566d824d1c3ac53320"
-  integrity sha512-DDyR/HlHeeNSkEi4Uj/F/7rER9ma0lnqqx8j9uEhdh0UyBWUCI1HJnX01OjTpLMB4F4TZHlK/6H2I6lqq3QC3Q==
+vue-ref@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/vue-ref/-/vue-ref-2.0.0.tgz#483084d732abed11da796778a8266a3af0ea1a9c"
+  integrity sha512-uKNKpFOVeWNqS2mrBZqnpLyXJo5Q+vnkex6JvpENvhXHFNBW/SJTP8vJywLuVT3DpxwXcF9N0dyIiZ4/NpTexQ==
 
 vue-router@^3.1.2:
   version "3.1.3"
